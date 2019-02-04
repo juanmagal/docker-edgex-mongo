@@ -15,7 +15,11 @@
 # limitations under the License.
 #
 
+rm /var/lib/mongodb/mongod.lock 
+
 set -e
+
+mongod --repair
 
 mongod --smallfiles &
 

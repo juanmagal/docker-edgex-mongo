@@ -15,16 +15,21 @@
 #
 ###############################################################################
 
-FROM balenalib/rpi-alpine
-MAINTAINER 
+FROM balenalib/rpi-raspbian:jessie
 
-RUN apk add --no-cache mongodb
+#RUN apk add --no-cache mongodb-tools 
+RUN apt-get update
+RUN apt-get -y --no-install-suggests install mongodb-server \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/lib/mongodb \
+    && rm -rf /etc/apt/apt.conf.d/10proxy
+
 
 #copy initialization script for later initialization
 COPY *.js /edgex/mongo/config/
-COPY launch-edgex-mongo.sh /edgex/mongo/config/
+COPY launch-edgex-mongo-rpi.sh /edgex/mongo/config/
 
 #expose Mongodb's port
 EXPOSE 27017
 
-CMD /edgex/mongo/config/launch-edgex-mongo.sh
+CMD /edgex/mongo/config/launch-edgex-mongo-rpi.sh

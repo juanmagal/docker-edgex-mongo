@@ -1,5 +1,6 @@
-###############################################################################
-# Copyright 2016-2017 Dell Inc.
+#!/bin/sh
+
+# Copyright 2017 Cavium Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,15 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-###############################################################################
-# Mongo DB image for EdgeX Foundry
-FROM mongo:3.4
 
-#copy initialization script for later initialization
-COPY *.js /edgex/mongo/config/
-COPY launch-edgex-mongo.sh /edgex/mongo/config/
+rm /var/lib/mongodb/mongod.lock 
 
-#expose Mongodb's port
-EXPOSE 27017
+rm /data/db/mongod.lock
 
-CMD /edgex/mongo/config/launch-edgex-mongo.sh
+set -e
+
+#mongod --repair
+
+mongod --journal --smallfiles &
+
+while true; do
+  mongo /edgex/mongo/config/init_mongo_rpi.js && break
+  sleep 5
+done
+
+wait
+
